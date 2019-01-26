@@ -2,26 +2,23 @@ package itsu.java.musicplayerfx.components;
 
 import com.jfoenix.controls.JFXSlider;
 import itsu.java.musicplayerfx.SongPlayerController;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import itsu.java.musicplayerfx.listener.mouse.SeekBarMousePressListener;
+import itsu.java.musicplayerfx.listener.spectrum.SpectrumListener;
+import itsu.java.musicplayerfx.listener.change.VolumeBarChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.AudioSpectrumListener;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class DrawerContent extends VBox {
-
-    private static final double LINE_WIDTH = 268 / 128.0;
 
     private ImageView albumImage;
     private Text songName;
@@ -42,7 +39,7 @@ public class DrawerContent extends VBox {
         albumImage = new ImageView();
         albumImage.setFitWidth(268);
         albumImage.setFitHeight(268);
-        albumImage.setImage(SongPlayerController.getAlbumArkWork());
+        albumImage.setImage(SongPlayerController.getAlbumArtWork());
 
         songName = new Text();
         songName.setWrappingWidth(268);
@@ -73,12 +70,7 @@ public class DrawerContent extends VBox {
         volume.setMaxWidth(100);
         volume.setPrefWidth(100);
         volume.setMax(10);
-        volume.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                SongPlayerController.volume(newValue.doubleValue());
-            }
-        });
+        volume.valueProperty().addListener(new VolumeBarChangeListener());
 
         HBox manage = new HBox();
         manage.getChildren().add(back);
@@ -93,9 +85,7 @@ public class DrawerContent extends VBox {
         seekBar.setMaxWidth(260);
         seekBar.setPrefWidth(260);
         seekBar.setMax(0);
-        seekBar.setOnMousePressed(e -> {
-            SongPlayerController.pause();
-        });
+        seekBar.setOnMousePressed(new SeekBarMousePressListener());
         seekBar.setOnMouseReleased(e -> {
             SongPlayerController.seek(seekBar.getValue());
             SongPlayerController.play();
@@ -117,7 +107,7 @@ public class DrawerContent extends VBox {
         box.getChildren().add(time);
         box.setStyle("-fx-background-color: #161616;");
 
-        canvas = new Canvas(128 * LINE_WIDTH, 60);
+        canvas = new Canvas(128 * SpectrumListener.LINE_WIDTH, 60);
         canvas.setVisible(false);
 
         this.getChildren().add(albumImage);
@@ -170,40 +160,7 @@ public class DrawerContent extends VBox {
 
     public void createSpectrum() {
         canvas.setVisible(true);
-
-        AudioSpectrumListener listener = new AudioSpectrumListener() {
-            private AudioSpectrumListener beforeListener;
-
-            {
-                beforeListener = SongPlayerController.getPlayer().getAudioSpectrumListener();
-            }
-
-            @Override
-            public void spectrumDataUpdate(double timestamp, double duration, float[] magnitudes, float[] phases) {
-                if (beforeListener != null) {
-                    beforeListener.spectrumDataUpdate(timestamp, duration, magnitudes, phases);
-                }
-
-                GraphicsContext g = canvas.getGraphicsContext2D();
-                g.setFill(Color.web("#161616"));
-                g.fillRect(0.0, 0.0, canvas.getWidth(), canvas.getHeight());
-
-                for (int i = 0; i < phases.length; i++) {
-                    double hue = (phases[i] + Math.PI) / (2.0 * Math.PI);
-                    if (hue < 0.0) {
-                        hue = 0.0;
-                    }
-                    if (hue > 1.0) {
-                        hue = 1.0;
-                    }
-
-                    g.setFill(Color.web("#ffffff"));
-                    g.fillRect(i * LINE_WIDTH, canvas.getHeight() - (magnitudes[i] + 60.0), LINE_WIDTH, canvas.getHeight());
-                }
-            }
-        };
-
-        SongPlayerController.setAudipSpectrumListener(listener);
+        SongPlayerController.setAudioSpectrumListener(new SpectrumListener(canvas));
     }
 
 }

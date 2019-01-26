@@ -1,0 +1,14 @@
+.jfx-button {
+     -jfx-button-type: RAISED;
+     -fx-background-color: #EEFF41;
+     -fx-text-fill: #212121;
+}
+
+.jfx-button .jfx-rippler {
+    -jfx-rippler-fill: rgba(235, 235, 235, 0.8);
+}
+
+.jfx-button:pressed {
+    -fx-background-color: #C6FF00;
+    -fx-text-fill: #212121;
+}

@@ -35,11 +35,11 @@ public class AppBar extends StackPane {
             burgerTask.play();
         });
 
-        title.setText("   MusicPlayerFX");
+        title.setText("MusicPlayerFX");
         title.setFill(Color.web("#ffffff"));
         title.setFont(Font.font("Arial", 20));
 
-        hbox.getChildren().add(h1);
+        //hbox.getChildren().add(h1);
         hbox.getChildren().add(title);
 
         main.setVgap(20);

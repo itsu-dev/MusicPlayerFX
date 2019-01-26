@@ -4,24 +4,27 @@ import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXSlider;
 import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.Mp3File;
+import itsu.java.musicplayerfx.GUIManager;
 import itsu.java.musicplayerfx.SongPlayerController;
+import itsu.java.musicplayerfx.Utils.FormatUtil;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+
+import java.util.Map;
 
 
 public class PlayingDisplay extends StackPane {
@@ -86,7 +89,7 @@ public class PlayingDisplay extends StackPane {
         vbox.setPrefHeight(64);
         vbox.setAlignment(Pos.CENTER);
         vbox.getChildren().add(box);
-        vbox.getChildren().add(seekBar);
+        //vbox.getChildren().add(seekBar);
 
         back = new Button();
         back.setPrefSize(32, 32);
@@ -134,28 +137,8 @@ public class PlayingDisplay extends StackPane {
 }
 
     public void setPlayingData() {
-        Mp3File file = SongPlayerController.getFile();
-        if (file != null) {
-            if (file.hasId3v2Tag()) {
-                ID3v2 id3v2 = file.getId3v2Tag();
-                title.setText(id3v2.getTitle() + " - " + id3v2.getArtist() + " / " + id3v2.getAlbum());
-            }
-
-        } else {
-            ObservableMap<String, Object> map = SongPlayerController.getPlayer().getMedia().getMetadata();
-            if (map.containsKey("title")) title.setText(String.valueOf(map.get("title")));
-
-            String src = "";
-            if (map.containsKey("artist")) src = String.valueOf(map.get("artist"));
-
-            if (!src.equals("")) {
-                if (map.containsKey("album")) src = src + " / " + String.valueOf(map.get("album"));
-            } else {
-                if (map.containsKey("album")) src = String.valueOf(map.get("album"));
-            }
-
-            if (!src.equals("")) title.setText(title.getText() + " - " + src);
-        }
+        Map<String, Object> data = SongPlayerController.getSongData();
+        title.setText(data.get("title") + " / " + data.get("album") + (data.get("year") != null && !data.get("year").equals("Unknown") ? " (" + data.get("year") + ")" : "") + " - " + data.get("artist"));
     }
 
     public void setImage(Image image) {
@@ -163,7 +146,7 @@ public class PlayingDisplay extends StackPane {
     }
 
     public void setMaxTime(double time) {
-        maxTime = SongPlayerController.secToString(time);
+        maxTime = FormatUtil.secToString(time);
         seekBar.setMax(time);
     }
 

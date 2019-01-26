@@ -1,0 +1,16 @@
+.jfx-decorator {
+    -fx-decorator-color: #2196F3;
+}
+
+.jfx-decorator .jfx-decorator-buttons-container {
+    -fx-background-color: -fx-decorator-color;
+}
+
+.jfx-hamburger StackPane {
+    -fx-background-color: white;
+}
+
+.jfx-decorator .resize-border {
+    -fx-border-color: -fx-decorator-color;
+    -fx-border-width: 0 4 4 4;
+}
